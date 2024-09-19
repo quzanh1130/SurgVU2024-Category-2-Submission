@@ -1,0 +1,148 @@
+_base_ = [
+    '../../_base_/models/slowfast_r50.py', '../../_base_/default_runtime.py'
+]
+
+# model settings
+model=dict(
+	backbone=dict(
+		resample_rate=4,  # tau
+		speed_ratio=4,  # alpha
+		channel_ratio=8,  # beta_inv
+		slow_pathway=dict(fusion_kernel=7, depth=101),
+		fast_pathway=dict(depth=101)),
+	cls_head=dict(
+		type='SlowFastHead',
+		in_channels=2304,  # 2048+256
+		num_classes=7,
+		spatial_type='avg',
+		dropout_ratio=0.5,
+		average_clips='prob'),
+)
+       
+
+dataset_type = 'VideoDataset'
+data_root = 'data/custom/1fps_videos/version 2'
+data_root_val = 'data/custom/1fps_videos/version 2'
+ann_file_train = 'data/custom/annotations/version 2/train_test.txt'
+ann_file_val = 'data/custom/annotations/version 2/fold_1/val_video.txt'
+ann_file_test = 'data/custom/annotations/version 2/test_video.txt'
+
+file_client_args = dict(io_backend='disk')
+train_pipeline = [
+    dict(type='DecordInit', **file_client_args),
+    dict(type='SampleFrames', clip_len=32, frame_interval=2, num_clips=1),
+    dict(type='DecordDecode'),
+    dict(type='Resize', scale=(-1, 256)),
+    dict(type='RandomResizedCrop'),
+    dict(type='Resize', scale=(224, 224), keep_ratio=False),
+    dict(type='Flip', flip_ratio=0.5),
+    dict(type='FormatShape', input_format='NCTHW'),
+    dict(type='PackActionInputs')
+]
+val_pipeline = [
+    dict(type='DecordInit', **file_client_args),
+    dict(
+        type='SampleFrames',
+        clip_len=32,
+        frame_interval=2,
+        num_clips=1,
+        test_mode=True),
+    dict(type='DecordDecode'),
+    dict(type='Resize', scale=(-1, 256)),
+    dict(type='CenterCrop', crop_size=224),
+    dict(type='FormatShape', input_format='NCTHW'),
+    dict(type='PackActionInputs')
+]
+test_pipeline = [
+    dict(type='DecordInit', **file_client_args),
+    dict(
+        type='SampleFrames',
+        clip_len=32,
+        frame_interval=2,
+        num_clips=10,
+        test_mode=True),
+    dict(type='DecordDecode'),
+    dict(type='Resize', scale=(-1, 256)),
+    dict(type='ThreeCrop', crop_size=256),
+    dict(type='FormatShape', input_format='NCTHW'),
+    dict(type='PackActionInputs')
+]
+train_dataloader = dict(
+    batch_size=4,
+    num_workers=4,
+    persistent_workers=True,
+    sampler=dict(type='DefaultSampler', shuffle=True),
+    dataset=dict(
+        type=dataset_type,
+        ann_file=ann_file_train,
+        data_prefix=dict(video=data_root),
+        pipeline=train_pipeline))
+val_dataloader = dict(
+    batch_size=4,
+    num_workers=4,
+    persistent_workers=True,
+    sampler=dict(type='DefaultSampler', shuffle=False),
+    dataset=dict(
+        type=dataset_type,
+        ann_file=ann_file_val,
+        data_prefix=dict(video=data_root_val),
+        pipeline=val_pipeline,
+        test_mode=True))
+test_dataloader = dict(
+    batch_size=1,
+    num_workers=1,
+    persistent_workers=True,
+    sampler=dict(type='DefaultSampler', shuffle=False),
+    dataset=dict(
+        type=dataset_type,
+        ann_file=ann_file_test,
+        data_prefix=dict(video=data_root_val),
+        pipeline=test_pipeline,
+        test_mode=True))
+
+val_evaluator = dict(type='AccMetric')
+test_evaluator = val_evaluator
+
+train_cfg = dict(
+    type='EpochBasedTrainLoop', max_epochs=50, val_begin=1, val_interval=1)
+val_cfg = dict(type='ValLoop')
+test_cfg = dict(type='TestLoop')
+
+optim_wrapper = dict(
+    optimizer=dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=1e-4),
+    clip_grad=dict(max_norm=40, norm_type=2))
+
+'''
+param_scheduler = [
+    dict(
+        type='LinearLR',
+        start_factor=0.1,
+        by_epoch=True,
+        begin=0,
+        end=34,
+        convert_to_iter_based=True),
+    dict(
+        type='CosineAnnealingLR',
+        T_max=256,
+        eta_min=0,
+        by_epoch=True,
+        begin=0,
+        end=256)
+]
+'''
+
+param_scheduler = [
+    dict(
+        type='MultiStepLR',
+        begin=0,
+        end=50,  # change from 100 to 50
+        by_epoch=True,
+        milestones=[20, 40],  # change milestones
+        gamma=0.1)
+]
+
+
+default_hooks = dict(
+    checkpoint=dict(interval=4, max_keep_ckpts=3), logger=dict(interval=100))
+    
+load_from = "https://download.openmmlab.com/mmaction/v1.0/recognition/slowfast/slowfast_r101_8xb8-8x8x1-256e_kinetics400-rgb/slowfast_r101_8xb8-8x8x1-256e_kinetics400-rgb_20220818-9c0e09bd.pth"

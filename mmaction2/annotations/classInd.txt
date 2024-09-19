@@ -1,0 +1,8 @@
+1 Suturing
+2 Uterine_horn
+3 Suspensory_ligaments
+4 Rectal_artery_vein
+5 Skills_application
+6 Range_of_motion
+7 Retraction_and_collision_avoidance
+8 Other_Unannotated

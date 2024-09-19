@@ -1,0 +1,8 @@
+Suturing
+Uterine_horn
+Suspensory_ligaments
+Rectal_artery_vein
+Skills_application
+Range_of_motion
+Retraction_and_collision_avoidance
+Other_Unannotated

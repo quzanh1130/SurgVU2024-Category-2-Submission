@@ -20,7 +20,7 @@ class SurgVUClassify:
         
         #Config and checkpoint
         config_path = 'configs/recognition/slowfast/slowfast_r101_8xb8-8x8x1-256e_rgb_1fps_video_final.py'
-        checkpoint_path = 'work_dirs/slow_fast/best_model.pth'
+        checkpoint_path = 'work_dirs/slowfast/best_model.pth'
         
         self.window_size = 60  # seconds
         self.overlap_percentage = 15  # percent

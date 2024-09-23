@@ -51,7 +51,7 @@ On Windows using Scoop (https://scoop.sh/)
 scoop install ffmpeg
 ```
 
-### 2.2 Install Python Dependencies (Choose One Method)
+### 2.2 Install Python Dependencies
 
 **Using Anaconda**
 ```bash
@@ -73,7 +73,7 @@ pip install -v -e .
 If the model file is missing at `mmaction2/work_dirs/slowfast/best_model.pth`, you can download it from the following Google Drive link:
 - [Download Model](https://drive.google.com/file/d/12cy_RJnHYARxj452y8fTgH920MSZgzt6/view?usp=drive_link)
 
-If the config file is missing at mmaction2/configs/recognition/slowfast/slowfast_r101_8xb8-8x8x1-256e_rgb_1fps_video_final.py, you can download it here:
+If the config file is missing at `mmaction2/configs/recognition/slowfast/slowfast_r101_8xb8-8x8x1-256e_rgb_1fps_video_final.py`, you can download it from the following Google Drive link:
 
 - [Download Config](https://drive.google.com/file/d/1PcUHVhJlPDXVnHBM-7tW4hQbIpo-F5iN/view?usp=sharing)
 
@@ -99,7 +99,7 @@ To use different configurations or model checkpoints, modify the `process_testin
 ```python
 #Config and checkpoint
 config_path = 'configs/recognition/slowfast/slowfast_r101_8xb8-8x8x1-256e_rgb_1fps_video_final.py'
-checkpoint_path = 'work_dirs/slow_fast/epoch_7873.pth'
+checkpoint_path = 'work_dirs/slowfast/best_model.pth'
 ```
 
 ### 4.2 Testing a Different Video
@@ -122,7 +122,7 @@ To prepare your submission, you will need to export the containerized applicatio
 
 ### Export Container
 
-Once Docker is installed, navigate to the 'mmaction2' directory and run the following command to export the container:
+Once Docker is installed, navigate to the `mmaction2` directory and run the following command to export the container:
 
 ```bash
 cd mmaction2

@@ -73,10 +73,10 @@ pip install -v -e .
 First you need to create folder to store model
 
 ```bash
-    cd mmaction2
-    mkdir work_dirs
-    cd work_dirs
-    mkdir slowfast
+cd mmaction2
+mkdir work_dirs
+cd work_dirs
+mkdir slowfast
 ```
 
 If the model file is missing at `mmaction2/work_dirs/slowfast/best_model.pth`, you can download it from the following Google Drive link:
